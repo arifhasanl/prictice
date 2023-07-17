@@ -1,12 +1,11 @@
 import { useState } from "react";
-import Distric from "./Distric";
-import { Country } from "country-state-city";
+import Swal from "sweetalert2";
 
-
-const CreateUser = () => {
+const CreateUser = ({ setModal}) => {
     const [selectedDistrict, setSelectedDistrict] = useState([]);
     const [selectedDivision, setSelectedDivision] = useState('');
-
+    const [type, setType] = useState('')
+    console.log(type);
     const divisionsByDistrict = {
         Dhaka: ['Dhaka', 'Gazipur', 'Narayanganj'],
         Chittagong: ['Chittagong', 'Coxs Bazar', 'Rangamati'],
@@ -31,7 +30,7 @@ const CreateUser = () => {
             first_name: firstName,
             last_name: lastName,
             user_type: userType,
-            division:division ,
+            division: division,
             district: district
         }
         console.log(userInfo);
@@ -43,8 +42,15 @@ const CreateUser = () => {
             body: JSON.stringify(userInfo)
         })
             .then(res => res.json())
-            .then(data => {
-                console.log(data, 'data');
+            .then(() => {
+                form.reset()
+                Swal.fire({
+                    position: 'top-end',
+                    icon: 'success',
+                    title: 'Your work has been saved',
+                    showConfirmButton: false,
+                    timer: 1500
+                })
             })
             .catch(error => {
                 console.log(error);
@@ -61,22 +67,32 @@ const CreateUser = () => {
         const division = event.target.value;
         setSelectedDivision(division);
     };
+    const handleType = (event) => {
+        const type = event.target.value;
+        setType(type)
+
+    }
     return (
-        <div className="mt-16">
-            <div className="card-body w-96 mx-auto border">
+        <div className=" fixed pt-16 inset-0 backdrop-blur-sm bg-black bg-opacity-5 w-full h-full ">
+            <div className="card-body  bg-white w-96 mx-auto border">
+                <div className=" text-end">
+
+                    <button onClick={() => setModal(false)} className="px-2 py-2 border border-2 inline">Close</button>
+
+                </div>
                 <form onSubmit={CreateUser}>
                     <div className="form-control">
                         <label className="label">
                             <span className="label-text">Frist Name</span>
                         </label>
-                        <input type="text" placeholder="Frist Name" name='fristname' className="input input-bordered" />
+                        <input type="text" required placeholder="Frist Name" name='fristname' className="input input-bordered" />
                     </div>
                     <div className="form-control">
 
                         <label className="label">
                             <span className="label-text">Last Name</span>
                         </label>
-                        <input type="text" placeholder="Last Name" name='lastname' className="input input-bordered" />
+                        <input type="text" required placeholder="Last Name" name='lastname' className="input input-bordered" />
                     </div>
                     <div className="form-control">
 
@@ -84,53 +100,58 @@ const CreateUser = () => {
                             <span className="label-text">Select User Type</span>
                         </label>
                         <div className='border'>
-                            <select name='usertype' className="select border w-full max-w-xs">
-                                <option>admin</option>
-                                <option>emplyee</option>
+                            <select name='usertype' required onChange={handleType} className="select border w-full max-w-xs">
+                                <option value="">select type</option>
+                                <option value="admin">admin</option>
+                                <option value="emplyee">emplyee</option>
                             </select>
                         </div>
                     </div>
-                    <div className="form-control">
+                    {
+                        type && <>
+                            <div className="form-control">
 
-                        <label className="label">
-                            <span className="label-text">Select Divison:</span>
-                        </label>
-                        <div className='border'>
-                            <select name='division' value={selectedDistrict} onChange={handleDistrictChange} className="select border w-full max-w-xs">
-                                <option value="">Select type</option>
-                                <option value="Rangpur">Rangpur</option>
-                                <option value="Rajshahi">Rajshahi</option>
-                                <option value="Mymensingh">Mymensingh</option>
-                                <option value="Sylhet">Sylhet</option>
-                                <option value="Dhaka">Dhaka</option>
-                                <option value="Khulna">Khulna</option>
-                                <option value="Barisal">Barisal</option>
-                                <option value="Chittagong">Chittagong</option>
+                                <label className="label">
+                                    <span className="label-text">Select Divison:</span>
+                                </label>
+                                <div className='border'>
+                                    <select name='division' required value={selectedDistrict} onChange={handleDistrictChange} className="select border w-full max-w-xs">
+                                        <option value="">Select type</option>
+                                        <option value="Rangpur">Rangpur</option>
+                                        <option value="Rajshahi">Rajshahi</option>
+                                        <option value="Mymensingh">Mymensingh</option>
+                                        <option value="Sylhet">Sylhet</option>
+                                        <option value="Dhaka">Dhaka</option>
+                                        <option value="Khulna">Khulna</option>
+                                        <option value="Barisal">Barisal</option>
+                                        <option value="Chittagong">Chittagong</option>
 
-                            </select>
-                        </div>
-                    </div>
-                    <div className="form-control">
+                                    </select>
+                                </div>
+                            </div>
+                            <div className="form-control">
 
-                        <label className="label">
-                            <span className="label-text">Select Dristic:</span>
-                        </label>
-                        <div className="border">
-                            <select name="district" value={selectedDivision} onChange={handleDivisionChange} className="select border w-full max-w-xs">
-                                <option value="">Select Division</option>
-                                {divisionsByDistrict[selectedDistrict]?.map((division) => (
-                                    <option key={division} value={division}>
-                                        {division}
-                                    </option>
-                                ))}
+                                <label className="label">
+                                    <span className="label-text">Select Dristic:</span>
+                                </label>
+                                <div className="border">
+                                    <select name="district" value={selectedDivision} onChange={handleDivisionChange} className="select border w-full max-w-xs">
+                                        <option value="">Select Dristic</option>
+                                        {divisionsByDistrict[selectedDistrict]?.map((division) => (
+                                            <option key={division} value={division}>
+                                                {division}
+                                            </option>
+                                        ))}
 
-                            </select>
-                        </div>
-                    </div>
+                                    </select>
+                                </div>
+                            </div>
+                        </>
+                    }
 
 
                     <div className="form-control mt-6">
-                        <input className="btn btn-primary" type="submit" value="Creat User" />
+                        <input  className="btn btn-primary" type="submit" value="Creat User" />
                     </div>
                 </form>
 
@@ -141,3 +162,5 @@ const CreateUser = () => {
 };
 
 export default CreateUser;
+
+
